@@ -122,7 +122,7 @@ if st.button("Analisar e adicionar refeição", type="primary", use_container_wi
                     contents.append(imagem_pil)
 
                 response = client.models.generate_content(
-                    model="gemini-2.5-flash",
+                    model="gemini-3.8-flash",
                     contents=contents,
                     config=types.GenerateContentConfig(
                         response_mime_type="application/json",
