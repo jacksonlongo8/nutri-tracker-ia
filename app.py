@@ -123,7 +123,6 @@ if st.button("Analisar e adicionar refeição", type="primary", use_container_wi
 
                 modelos_disponiveis = [
                     "gemini-3.8-flash",
-                    "gemini-3.8-flash-lite",
                     "gemini-3.5-flash-lite",
                 ]
 
@@ -165,6 +164,18 @@ if st.button("Analisar e adicionar refeição", type="primary", use_container_wi
 
             except Exception as e:
                 st.error(f"Erro ao processar a refeição: {e}")
+
+with st.expander("🛠️ Diagnóstico da API"):
+    if st.button("Listar modelos disponíveis para minha chave"):
+        if not api_key:
+            st.error("Informe a GEMINI_API_KEY primeiro.")
+        else:
+            try:
+                client = genai.Client(api_key=api_key)
+                nomes = [m.name for m in client.models.list()]
+                st.write(nomes)
+            except Exception as e:
+                st.error(f"Erro ao listar modelos: {e}")
 
 st.divider()
 st.subheader("📋 Refeições de hoje")
