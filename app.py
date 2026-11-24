@@ -49,6 +49,28 @@ def imagem_para_base64(imagem: Image.Image) -> str:
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
 
+def obter_modelo_texto(client: Groq, preferidos: list[str] | None = None) -> str:
+    preferidos = preferidos or [
+        "llama-3.3-70b-versatile",
+        "llama-3.1-8b-instant",
+        "meta-llama/llama-4-scout-17b-16e-instruct",
+        "qwen/qwen3-32b",
+        "gemma2-9b-it",
+    ]
+    try:
+        disponiveis = [m.id for m in client.models.list().data]
+        for candidato in preferidos:
+            if candidato in disponiveis:
+                return candidato
+        for modelo_id in disponiveis:
+            baixa = modelo_id.lower()
+            if "whisper" not in baixa and "guard" not in baixa and "embed" not in baixa:
+                return modelo_id
+    except Exception:
+        pass
+    return "llama-3.1-8b-instant"
+
+
 st.title("🥗 Nutri IA")
 st.caption("Contagem rápida de macros + Chat de substituições")
 
@@ -143,13 +165,16 @@ with aba_diario:
                                 ],
                             }
                         ]
-                        modelo = "meta-llama/llama-4-scout-17b-16e-instruct"
+                        modelo = obter_modelo_texto(
+                            client,
+                            preferidos=["meta-llama/llama-4-scout-17b-16e-instruct", "llama-4-scout-17b-16e-instruct"],
+                        )
                     else:
                         mensagens = [
                             {"role": "system", "content": prompt_sistema},
                             {"role": "user", "content": f"Refeição: {descricao_texto.strip()}"},
                         ]
-                        modelo = "llama-3.3-70b-versatile"
+                        modelo = obter_modelo_texto(client)
 
                     completion = client.chat.completions.create(
                         model=modelo,
@@ -230,9 +255,10 @@ with aba_chat:
                         """
 
                         historico_envio = [{"role": "system", "content": contexto_nutri}] + st.session_state.chat_nutri[-8:]
+                        modelo_chat = obter_modelo_texto(client)
 
                         resposta_chat = client.chat.completions.create(
-                            model="llama-3.3-70b-versatile",
+                            model=modelo_chat,
                             messages=historico_envio,
                             temperature=0.4,
                             max_tokens=700,
