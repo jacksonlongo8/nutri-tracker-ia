@@ -31,7 +31,7 @@ if not api_key:
     except Exception:
         api_key = None
 
-st.title("🥗 Nutri Tracker IA")
+st.title("🥗 Nutri Jackson Logo IA")
 st.caption("Registro de refeições por foto ou texto")
 
 with st.expander("⚙️ Configurar metas diárias"):
