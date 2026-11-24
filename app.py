@@ -7,7 +7,7 @@ from PIL import Image
 from groq import Groq
 
 st.set_page_config(
-    page_title="Nutri IA",
+    page_title="Jackson Longo Nutri",
     page_icon="🥗",
     layout="centered",
 )
@@ -71,7 +71,7 @@ def obter_modelo_texto(client: Groq, preferidos: list[str] | None = None) -> str
     return "llama-3.1-8b-instant"
 
 
-st.title("🥗 Nutri IA")
+st.title("🥗 Jackson Longo Nutri")
 st.caption("Contagem rápida de macros + Chat de substituições")
 
 if not api_key:
