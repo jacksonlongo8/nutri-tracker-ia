@@ -122,11 +122,11 @@ if st.button("Analisar e adicionar refeição", type="primary", use_container_wi
                     contents.append(imagem_pil)
 
                 # Lista de modelos com fallback automático em caso de pico de tráfego (503 / 429)
-                modelos_disponiveis = [
-                    "gemini-3.8-flash",
-                    "gemini-3.8-flash-lite",
-                    "gemini-2.5-flash-lite",
-                ]
+               modelos_disponiveis = [
+    "gemini-3.8-flash",
+    "gemini-3.8-flash-lite",
+    "gemini-3.5-flash-lite",
+]
 
                 response = None
                 ultimo_erro = None
