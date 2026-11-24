@@ -6,7 +6,7 @@ from google import genai
 from google.genai import types
 
 st.set_page_config(
-    page_title="Nutri Jackson Longo IA",
+    page_title="Nutri Tracker IA",
     page_icon="🥗",
     layout="centered",
 )
@@ -31,7 +31,7 @@ if not api_key:
     except Exception:
         api_key = None
 
-st.title("🥗 Nutri Jackson Logo IA")
+st.title("🥗 Nutri Tracker IA")
 st.caption("Registro de refeições por foto ou texto")
 
 with st.expander("⚙️ Configurar metas diárias"):
@@ -121,14 +121,36 @@ if st.button("Analisar e adicionar refeição", type="primary", use_container_wi
                 if imagem_pil is not None:
                     contents.append(imagem_pil)
 
-                response = client.models.generate_content(
-                    model="gemini-3.8-flash",
-                    contents=contents,
-                    config=types.GenerateContentConfig(
-                        response_mime_type="application/json",
-                        temperature=0.2,
-                    ),
-                )
+                # Lista de modelos com fallback automático em caso de pico de tráfego (503 / 429)
+                modelos_disponiveis = [
+                    "gemini-3.8-flash",
+                    "gemini-3.8-flash-lite",
+                    "gemini-2.5-flash-lite",
+                ]
+
+                response = None
+                ultimo_erro = None
+
+                for nome_modelo in modelos_disponiveis:
+                    try:
+                        response = client.models.generate_content(
+                            model=nome_modelo,
+                            contents=contents,
+                            config=types.GenerateContentConfig(
+                                response_mime_type="application/json",
+                                temperature=0.2,
+                            ),
+                        )
+                        break
+                    except Exception as erro_modelo:
+                        ultimo_erro = erro_modelo
+                        msg = str(erro_modelo)
+                        if "503" in msg or "UNAVAILABLE" in msg or "429" in msg or "NOT_FOUND" in msg:
+                            continue
+                        raise erro_modelo
+
+                if response is None:
+                    raise ultimo_erro
 
                 dados = json.loads(response.text)
                 nova_refeicao = {
